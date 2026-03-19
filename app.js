@@ -1,7 +1,8 @@
 const express = require("express")
 const morgan = require("morgan")
 const cors = require('cors');
-const productRouter = require("./routes/productsRoutes")
+const productRouter = require("./routes/productsRoutes");
+const config = require("./utlis/config")
 
 const app = express()
 
@@ -14,7 +15,7 @@ app.use(express.urlencoded())
 // For logging
 app.use(morgan('dev'))
 
-const allowedOrigins = ['http://localhost:3001', 'http://localhost:5173', 'http://localhost:5174', 'https://backend-s4v5.onrender.com', 'https://your-production-site.com'];
+const allowedOrigins = [config.localhost_backend_server_3001, config.localhost_frontend_server_5173, config.localhost_frontend_server_5174];
 
 // use cors middleware
 app.use(cors({
