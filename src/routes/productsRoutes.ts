@@ -1,6 +1,6 @@
-const express = require('express')
-const productsController = require('../controllers/productsController')
-const multer = require("multer");
+import express from 'express'
+import productsController from '../controllers/productsController'
+import multer from "multer"
 
 const productRouter = express.Router()
 
@@ -14,4 +14,4 @@ const upload = multer({
 productRouter.get('/', productsController.allProducts)
 productRouter.post('/create',  upload.array("images", 10), productsController.addProducts)
 
-module.exports = productRouter
+export default productRouter
