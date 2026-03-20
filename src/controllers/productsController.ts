@@ -1,6 +1,7 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const config = require('../utlis/config');
-const products = require("../models/products");
+import { S3Client, PutObjectCommand }  from "@aws-sdk/client-s3";
+import config  from '../utlis/config';
+import products  from "../models/products";
+import { Request, Response } from "express";
 
 
 
@@ -13,21 +14,21 @@ const s3 = new S3Client({
 });
 
 const productsController = {
-    allProducts: async (req, res) => {
+    allProducts: async (req:Request, res:Response) => {
         try {
             const allProducts = await products.find().select("-__v -_id")
             res.status(200).json({ allProducts });
         }
-        catch (e) {
+        catch (e:any) {
             res.status(500).json({ message: e.message })
         }
     },
 
-    addProducts: async (req, res) => {
+    addProducts: async (req:Request, res:Response) => {
         try {
-            const files = req.files;
+            const files:any = req.files;
 
-            const uploads = files.map(async (file) => {
+            const uploads = files.map(async (file:any) => {
 
                 let type = "Other";
                 let productName = file.originalname;
@@ -73,10 +74,10 @@ const productsController = {
                 urls: uploadedUrls
             });
         }
-        catch (e) {
+        catch (e:any) {
             res.status(500).json({ message: e.message })
         }
     }
 }
 
-module.exports = productsController
+export default productsController
