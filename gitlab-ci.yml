@@ -3,6 +3,8 @@ stages:
   - test
 
 create_file:
+  tags:
+    -my-runner
   image: alpine
   stage: build
   script:
@@ -14,6 +16,8 @@ create_file:
      - build/
 
 test_file:
+  tags:
+    -my-runner
   image: alpine
   stage: test
   script:
