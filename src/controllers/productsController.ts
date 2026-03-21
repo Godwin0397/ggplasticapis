@@ -1,7 +1,8 @@
-import { S3Client, PutObjectCommand }  from "@aws-sdk/client-s3";
-import config  from '../utlis/config';
-import products  from "../models/products";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import config from '../utlis/config';
+import products from "../models/products";
 import { Request, Response } from "express";
+import getFileDetails from "../utlis/getFileDetails";
 
 
 
@@ -14,68 +15,81 @@ const s3 = new S3Client({
 });
 
 const productsController = {
-    allProducts: async (req:Request, res:Response) => {
+    allProducts: async (req: Request, res: Response) => {
         try {
             const allProducts = await products.find().select("-__v -_id")
             res.status(200).json({ allProducts });
         }
-        catch (e:any) {
+        catch (e: any) {
             res.status(500).json({ message: e.message })
         }
     },
-
-    addProducts: async (req:Request, res:Response) => {
+    addProducts: async (req: Request, res: Response) => {
         try {
-            const files:any = req.files;
+            const files = req.files as Express.Multer.File[];
 
-            const uploads = files.map(async (file:any) => {
+            if (!files.length) {
+                return res.status(400).json({ message: "No files uploaded" });
+            }
 
-                let type = "Other";
-                let productName = file.originalname;
+            // ✅ single file upload function
+            const uploadFile = async (file: any) => {
+                try {
+                    const { type, productName } = getFileDetails(file.originalname);
 
-                if (file.originalname.includes("Product")) {
-                    productName = file.originalname.split(" Product")[0];
-                    type = "Product";
-                } else if (file.originalname.includes("Machine")) {
-                    productName = file.originalname.split(" Machine")[0];
-                    type = "Machine";
-                } else {
-                    productName = file.originalname.split("Other")[0];
+                    const fileName = file.originalname.replace(/\s+/g, "");
+
+                    const params = {
+                        Bucket: config.AWS_Bucket_Name,
+                        Key: fileName,
+                        Body: file.buffer,
+                        ContentType: file.mimetype
+                    };
+
+                    await s3.send(new PutObjectCommand(params));
+
+                    const fileUrl = `https://${config.AWS_Bucket_Name}.s3.${config.AWS_Region}.amazonaws.com/${fileName}`;
+
+                    const newProduct = new products({
+                        productName,
+                        productURL: fileUrl,
+                        type
+                    });
+
+                    return await newProduct.save();
+
+                } catch (error) {
+                    console.error("Upload failed:", file.originalname, error);
+                    return null; // prevent full failure
                 }
+            };
 
-                const fileName = file.originalname.replace(/\s+/g, "");
+            // ✅ controlled parallel execution
+            const BATCH_SIZE = 5;
+            const results: any[] = [];
 
+            for (let i = 0; i < files.length; i += BATCH_SIZE) {
+                const batch = files.slice(i, i + BATCH_SIZE);
 
-                const params = {
-                    Bucket: config.AWS_Bucket_Name,
-                    Key: fileName,
-                    Body: file.buffer,
-                    ContentType: file.mimetype
-                };
+                const uploadedBatch = await Promise.all(
+                    batch.map(uploadFile)
+                );
 
-                await s3.send(new PutObjectCommand(params));
+                results.push(...uploadedBatch);
+            }
 
-                // generate file URL
-                const fileUrl = `https://${config.AWS_Bucket_Name}.s3.${config.AWS_Region}.amazonaws.com/${fileName}`;
-
-                const newProduct = new products({
-                    productName,
-                    productURL: fileUrl,
-                    type
-                });
-
-                return await newProduct.save();
-            });
-
-            const uploadedUrls = await Promise.all(uploads);
+            // remove failed uploads
+            const uploadedUrls = results.filter(Boolean);
 
             res.json({
                 message: "Images uploaded successfully",
+                count: uploadedUrls.length,
                 urls: uploadedUrls
             });
-        }
-        catch (e:any) {
-            res.status(500).json({ message: e.message })
+
+        } catch (e: any) {
+            console.error("Error in addProducts:", e);
+            res.status(500).json({ message: e.message });
         }
     }
 }
