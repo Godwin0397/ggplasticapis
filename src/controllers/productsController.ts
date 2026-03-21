@@ -17,7 +17,7 @@ const s3 = new S3Client({
 const productsController = {
     allProducts: async (req: Request, res: Response) => {
         try {
-            const allProducts = await products.find().select("-__v -_id")
+            const allProducts = await products.find({type: "Product"}).select("-__v -_id").lean()
             res.status(200).json({ allProducts });
         }
         catch (e: any) {
