@@ -1,20 +1,63 @@
 stages:
   - build
   - test
+  - deploy
 
-create_file:
-  image: alpine
+# 🔹 BUILD STAGE
+build_node:
+  image: node:18
   stage: build
   script:
-    - echo "Building Run ..."
-    - mkdir build
-    - touch build/somefile.txt
+    - npm install
   artifacts:
     paths:
-     - build/
+      - node_modules/
+    expire_in: 1 hour
 
-test_file:
-  image: alpine
+# 🔹 TEST STAGE
+test_node:
+  image: node:18
   stage: test
+  dependencies:
+    - build_node
   script:
-    - test -f build/somefile.txt
+    - echo "No tests available, skipping test stage"
+
+# 🔹 DEPLOY STAGE
+deploy_node:
+  image: alpine
+  stage: deploy
+  dependencies:
+    - build_node
+
+  # ✅ Only deploy from main branch
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+  before_script:
+    - apk add --no-cache openssh rsync
+    - mkdir -p ~/.ssh
+
+    # ✅ Add SSH private key
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+
+    # ✅ Trust server
+    - ssh-keyscan -H 16.112.63.158 >> ~/.ssh/known_hosts
+
+  script:
+    # ✅ Remove old backend files (adjust path if needed)
+    - ssh ubuntu@16.112.63.158 "rm -rf /home/ubuntu/gg-plastic-api/*"
+
+    # ✅ Copy project to server (excluding node_modules)
+    - rsync -avz --exclude 'node_modules' ./ ubuntu@16.112.63.158:/home/ubuntu/gg-plastic-api
+
+    # ✅ Install dependencies on server & restart app (PM2 recommended)
+    - ssh ubuntu@16.112.63.158 "
+        cd /home/ubuntu/gg-plastic-api &&
+        npm install &&
+        pm2 restart all || pm2 start app.js --name gg-plastic-api
+      "
+
+  environment:
+    name: production
