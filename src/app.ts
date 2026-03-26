@@ -4,18 +4,19 @@ import cors  from 'cors'
 import productRouter  from "./routes/productsRoutes"
 import config  from "./utlis/config"
 
+// Initialize Express ---
 const app = express()
 
 // To parse JSON body
 app.use(express.json())
 
 //  To parse FORM data
-app.use(express.urlencoded())
+app.use(express.urlencoded({ extended: true }))
 
 // For logging
 app.use(morgan('dev'))
 
-const allowedOrigins = [config.localhost_backend_server_3001, config.localhost_frontend_server_5173, config.localhost_frontend_server_5174, config.localhost_frontend_server_5175];
+const allowedOrigins = [config.localhost_backend_server_3001, config.localhost_frontend_server_5173, config.localhost_frontend_server_5174, config.localhost_frontend_server_5175, config.publicIP];
 
 // use cors middleware
 app.use(cors({
@@ -33,8 +34,5 @@ app.use(cors({
 
 app.use('/api/products', productRouter)
 
-app.use((err:Error, req:Request, res:Response, next:NextFunction) => {
-  res.status(500).json({ error: err.message });
-});
 
 export default app;

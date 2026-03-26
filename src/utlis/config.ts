@@ -13,6 +13,7 @@ interface Config {
   localhost_frontend_server_5173: string;
   localhost_frontend_server_5174: string;
   localhost_frontend_server_5175: string;
+  publicIP: string;
 }
 
 // Parse env variables and provide defaults if needed
@@ -28,6 +29,7 @@ const config: Config = {
   localhost_frontend_server_5173: process.env.localhost_frontend_server_5173 || "",
   localhost_frontend_server_5174: process.env.localhost_frontend_server_5174 || "",
   localhost_frontend_server_5175: process.env.localhost_frontend_server_5175 || "",
+  publicIP: process.env.publicIP || "",
 };
 
 export default config;
