@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            font-family: Arial;
+            font-size: 12px;
+            padding: 20px;
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 4px 6px;
+            vertical-align: middle;
+        }
+
+        .border td {
+            border: 1px solid #000;
+        }
+
+        .no-border td {
+            border: none;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .blue {
+            background-color: #4472C4;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .bottom-line {
+            border-bottom: 1px solid #000;
+        }
+
+        .logo img {
+            width: 110px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 🔷 HEADER -->
+    <table class="no-border">
+        <tr>
+            <td class="bold" style="font-size:18px;">{{companyName}}</td>
+            <td class="right bold" style="font-size:20px;">Invoice</td>
+        </tr>
+    </table>
+
+    <hr style="border:1px solid #000; margin:5px 0;">
+
+    <!-- 🔷 INVOICE META + LOGO (FINAL FIX) -->
+    <table style="width:100%; border-collapse:collapse;">
+        <tr>
+
+            <!-- LEFT: INVOICE TABLE -->
+            <td style="width:30%; vertical-align:top;">
+
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr>
+                        <td style="border:1px solid #000;" class="blue">Invoice No.</td>
+                        <td style="border:1px solid #000;" class="right">{{invoiceNo}}</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000;" class="blue">Date</td>
+                        <td style="border:1px solid #000;" class="right">{{date}}</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000;" class="blue">Terms(Days)</td>
+                        <td style="border:1px solid #000;" class="right">{{terms}}</td>
+                    </tr>
+                </table>
+
+            </td>
+
+            <!-- RIGHT: LOGO -->
+            <td style="width:70%; text-align:right; vertical-align:top;">
+                <img src="{{logo}}"
+                    style="width:110px;" />
+            </td>
+
+        </tr>
+    </table>
+
+    <!-- 🔷 COMPANY DETAILS (NO EXTRA PADDING FIXED) -->
+    <table class="no-border" style="margin-top:6px;">
+        <tr>
+            <td style="width:70%;">
+                <table>
+                    <tr>
+                        <td class="blue">Company Details</td>
+                    </tr>
+                    <tr>
+                        <td class="bold">{{companyName}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{companyAddress}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{companyCity}}, {{companyState}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{companyPincode}}</td>
+                    </tr>
+                    {{#if gstType}}
+                    <tr>
+                        <td>GST No. {{companyGST}}</td>
+                    </tr>
+                    {{/if}}
+                    <tr>
+                        <td>Ph: {{companyPhone}}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- 🔷 BILL TO -->
+    <div style="margin-top:10px;" class="bold">Bill To :</div>
+
+    <table class="border" style="width:70%;">
+        <tr>
+            <td>Name :</td>
+            <td class="bold">{{customerName}}</td>
+        </tr>
+        <tr>
+            <td>Address :</td>
+            <td>{{customerAddress}}</td>
+        </tr>
+        <tr>
+            <td>City :</td>
+            <td>{{customerCity}}</td>
+        </tr>
+        <tr>
+            <td>State :</td>
+            <td>{{customerState}}</td>
+        </tr>
+        <tr>
+            <td>Pin code :</td>
+            <td>{{customerPincode}}</td>
+        </tr>
+        <tr>
+            <td>GST NO :</td>
+            <td>{{customerGST}}</td>
+        </tr>
+        <tr>
+            <td>Phone :</td>
+            <td>{{customerPhone}}</td>
+        </tr>
+        <tr>
+            <td>Email :</td>
+            <td>{{customerEmail}}</td>
+        </tr>
+    </table>
+
+    <!-- 🔷 ITEMS TABLE (WIDTH FIX + ALIGNMENT BASE) -->
+    <table class="border" style="margin-top:20px;">
+        <colgroup>
+            <col style="width:60%;"> <!-- increased -->
+            <col style="width:15%;">
+            <col style="width:10%;"> <!-- reduced -->
+            <col style="width:15%;">
+        </colgroup>
+
+        <tr class="blue">
+            <td>Description</td>
+            <td class="right">Qty</td>
+            <td class="right">Unit Price</td>
+            <td class="right">Total</td>
+        </tr>
+
+        {{#each items}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td class="right">{{this.qty}}</td>
+            <td class="right">₹ {{this.price}}</td>
+            <td class="right">₹ {{this.total}}</td>
+        </tr>
+        {{/each}}
+
+        <!-- 6 EMPTY ROWS -->
+        <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <!-- 🔷 TOTALS WITH PROPER WIDTH DISTRIBUTION -->
+    <table style="width:100%; border-collapse:collapse;">
+
+        <tr>
+
+            <!-- LEFT (SMALL WIDTH) -->
+            <td style="width:30%; vertical-align:middle; text-align:center;">
+                <strong>Thank you for your Business !</strong>
+            </td>
+
+            <!-- RIGHT (LARGE WIDTH) -->
+            <td style="width:70%;">
+
+                <table style="width:100%; border-collapse:collapse;">
+
+                    <colgroup>
+                        <col style="width:60%;">
+                        <col style="width:15%;">
+                        <col style="width:10%;">
+                        <col style="width:15%;">
+                    </colgroup>
+
+                    <tr>
+                        <td></td>
+                        <td colspan="2" class="right">SUBTOTAL</td>
+                        <td class="right bottom-line">₹ {{subtotal}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td colspan="2" class="right">DISCOUNT</td>
+                        <td class="right bottom-line">₹ {{discount}}</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="3" class="right">SUBTOTAL LESS DISCOUNT</td>
+                        <td class="right bottom-line">₹ {{subtotalLessDiscount}}</td>
+                    </tr>
+
+                    {{#if gstType}}
+                    <tr>
+                        <td colspan="3" class="right">CGST 9% + SGST 9%</td>
+                        <td class="right bottom-line">18%</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td colspan="2" class="right">TOTAL TAX</td>
+                        <td class="right bottom-line">₹ {{tax}}</td>
+                    </tr>
+                    {{/if}}
+
+                    <tr>
+                        <td colspan="3" class="right">SHIPPING/HANDLING</td>
+                        <td class="right bottom-line">₹ {{shipping}}</td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td colspan="2" class="right bold" style="background:#4472C4; color:#fff;">
+                            TOTAL AMOUNT
+                        </td>
+                        <td class="right bold bottom-line">₹ {{grandTotal}}</td>
+                    </tr>
+
+                </table>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+</body>
+
+</html>

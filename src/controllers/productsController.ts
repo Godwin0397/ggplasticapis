@@ -3,6 +3,7 @@ import config from '../utlis/config';
 import products from "../models/products";
 import { Request, Response } from "express";
 import getFileDetails from "../utlis/getFileDetails";
+import uploadToS3 from "../utlis/uploadToS3";
 
 
 
@@ -18,7 +19,7 @@ const s3 = new S3Client({
 const productsController = {
     allProducts: async (req: Request, res: Response) => {
         try {
-            const allProducts = await products.find({type: "Product"}).select("-__v -_id").lean()
+            const allProducts = await products.find({ type: "Product" }).select("-__v -_id -createdAt -updatedAt").lean()
             res.status(200).json({ allProducts });
         }
         catch (e: any) {
@@ -29,27 +30,18 @@ const productsController = {
         try {
             const files = req.files as Express.Multer.File[];
 
-            if (!files.length) {
+            if (!files?.length) {
                 return res.status(400).json({ message: "No files uploaded" });
             }
 
-            // ✅ single file upload function
-            const uploadFile = async (file: any) => {
+            const uploadFile = async (file: Express.Multer.File) => {
                 try {
                     const { type, productName } = getFileDetails(file.originalname);
 
-                    const fileName = file.originalname.replace(/\s+/g, "");
-
-                    const params = {
-                        Bucket: config.AWS_Bucket_Name,
-                        Key: fileName,
-                        Body: file.buffer,
-                        ContentType: file.mimetype
-                    };
-
-                    await s3.send(new PutObjectCommand(params));
-
-                    const fileUrl = `https://${config.AWS_Bucket_Name}.s3.${config.AWS_Region}.amazonaws.com/${fileName}`;
+                    // ✅ reuse common function
+                    const fileUrl = await uploadToS3({
+                        file
+                    });
 
                     const newProduct = new products({
                         productName,
@@ -61,11 +53,10 @@ const productsController = {
 
                 } catch (error) {
                     console.error("Upload failed:", file.originalname, error);
-                    return null; // prevent full failure
+                    return null;
                 }
             };
 
-            // ✅ controlled parallel execution
             const BATCH_SIZE = 5;
             const results: any[] = [];
 
@@ -79,13 +70,12 @@ const productsController = {
                 results.push(...uploadedBatch);
             }
 
-            // remove failed uploads
             const uploadedUrls = results.filter(Boolean);
 
             res.json({
                 message: "Images uploaded successfully",
                 count: uploadedUrls.length,
-                urls: uploadedUrls
+                data: uploadedUrls
             });
 
         } catch (e: any) {

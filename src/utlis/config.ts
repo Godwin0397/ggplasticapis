@@ -8,7 +8,8 @@ interface Config {
   AWS_Access_Key: string;
   AWS_Secret_Key: string;
   AWS_Region: string;
-  AWS_Bucket_Name: string;
+  AWS_Bucket_Name01: string;
+  AWS_Bucket_Name02: string;
   localhost_backend_server_3001: string;
   localhost_frontend_server_5173: string;
   localhost_frontend_server_5174: string;
@@ -24,7 +25,8 @@ const config: Config = {
   AWS_Access_Key: process.env.AWS_Access_Key || "",
   AWS_Secret_Key: process.env.AWS_Secret_Key || "",
   AWS_Region: process.env.AWS_Region || "",
-  AWS_Bucket_Name: process.env.AWS_Bucket_Name || "",
+  AWS_Bucket_Name01: process.env.AWS_Bucket_Name01 || "",
+  AWS_Bucket_Name02: process.env.AWS_Bucket_Name02 || "",
   localhost_backend_server_3001: process.env.localhost_backend_server_3001 || "",
   localhost_frontend_server_5173: process.env.localhost_frontend_server_5173 || "",
   localhost_frontend_server_5174: process.env.localhost_frontend_server_5174 || "",
