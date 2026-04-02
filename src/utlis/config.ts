@@ -17,13 +17,16 @@ interface Config {
   publicIP: string;
   production_frontend_website: string;
   production_backend: string;
-  production_port: number
+  production_port: number;
+  uat_backend: string;
+  uat_port: number;
 }
 
 // Parse env variables and provide defaults if needed
 const config: Config = {
   mongodb_url: process.env.mongodb_url || "",
   port: process.env.port ? Number(process.env.port) : 3001,
+  uat_port: process.env.uat_port ? Number(process.env.uat_port) : 3002,
   production_port: process.env.production_port ? Number(process.env.production_port) : 5000,
   JWT_SECRET: process.env.JWT_SECRET || "",
   AWS_Access_Key: process.env.AWS_Access_Key || "",
@@ -38,6 +41,7 @@ const config: Config = {
   publicIP: process.env.publicIP || "",
   production_frontend_website: process.env.production_frontend_website || "",
   production_backend: process.env.production_backend || "",
+  uat_backend: process.env.uat_backend || "",
 };
 
 export default config;
