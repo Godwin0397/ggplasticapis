@@ -29,7 +29,7 @@ else {
     console.log(`Worker ${process.pid} started`);
     mongoose.connect(config.mongodb_url).then(() => {
         console.log("MongoDB Connected Successfully!!!")
-        app.listen(config.port, () => {
+        app.listen(config.port, '0.0.0.0', () => {
             console.log(`Server is running on port: ${config.port}`)
         })
     }).catch((err: any) => {
