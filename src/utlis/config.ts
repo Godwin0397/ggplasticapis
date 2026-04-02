@@ -15,12 +15,16 @@ interface Config {
   localhost_frontend_server_5174: string;
   localhost_frontend_server_5175: string;
   publicIP: string;
+  production_frontend_website: string;
+  production_backend: string;
+  production_port: number
 }
 
 // Parse env variables and provide defaults if needed
 const config: Config = {
   mongodb_url: process.env.mongodb_url || "",
-  port: process.env.port ? Number(process.env.port) : 5000,
+  port: process.env.port ? Number(process.env.port) : 3001,
+  production_port: process.env.production_port ? Number(process.env.production_port) : 5000,
   JWT_SECRET: process.env.JWT_SECRET || "",
   AWS_Access_Key: process.env.AWS_Access_Key || "",
   AWS_Secret_Key: process.env.AWS_Secret_Key || "",
@@ -32,6 +36,8 @@ const config: Config = {
   localhost_frontend_server_5174: process.env.localhost_frontend_server_5174 || "",
   localhost_frontend_server_5175: process.env.localhost_frontend_server_5175 || "",
   publicIP: process.env.publicIP || "",
+  production_frontend_website: process.env.production_frontend_website || "",
+  production_backend: process.env.production_backend || "",
 };
 
 export default config;
