@@ -31,7 +31,6 @@ deploy:
     - ssh-keyscan -H $SSH_HOST_DEV >> ~/.ssh/known_hosts
   script:
     - echo "Deploying main branch to Dev server..."
-    - ls -la              # debug: check files
-    - rsync -avz --delete dist/ $SSH_USER@$SSH_HOST_DEV:$APP_DIR_DEV
+    - rsync -avz --delete package.json package-lock.json dist/ $SSH_USER@$SSH_HOST_DEV:$APP_DIR_DEV
   only:
     - main
