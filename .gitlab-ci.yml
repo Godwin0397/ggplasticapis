@@ -62,7 +62,7 @@ deploy-dev:
     echo dev_backend=$dev_backend >> $APP_DIR_DEV/.env
     "
 
-  # 🔥 Install dependencies (THIS WAS MISSING)
+  # 🔥 Install dependencies
   - >
     ssh $SSH_USER@$SSH_HOST_DEV "
     cd $APP_DIR_DEV &&
@@ -80,7 +80,6 @@ deploy-dev:
 
   only:
     - main
-
 
 # ================= UAT DEPLOY =================
 deploy-uat:
@@ -129,3 +128,59 @@ deploy-uat:
 
   only:
     - uat
+
+# ================= PROD DEPLOY =================
+deploy-prod:
+  stage: deploy
+  image: alpine:latest
+  dependencies:
+    - build
+
+  before_script:
+    - apk add --no-cache openssh rsync
+    - mkdir -p ~/.ssh
+    - echo "$EC2_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST_PROD >> ~/.ssh/known_hosts
+
+  script:
+    - echo "🚀 Deploying to PROD server..."
+
+    # Copy files to PROD folder
+    - rsync -avz --delete ./ $SSH_USER@$SSH_HOST_PROD:$APP_DIR_PROD
+
+    # Create .env for PROD
+    - >
+      ssh $SSH_USER@$SSH_HOST_PROD "
+      echo mongodb_url=$mongodb_url > $APP_DIR_PROD/.env &&
+      echo port=$production_port >> $APP_DIR_PROD/.env &&
+      echo JWT_SECRET=$JWT_SECRET >> $APP_DIR_PROD/.env &&
+      echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> $APP_DIR_PROD/.env &&
+      echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> $APP_DIR_PROD/.env &&
+      echo AWS_REGION=$AWS_REGION >> $APP_DIR_PROD/.env &&
+      echo AWS_Bucket_Name01=$AWS_Bucket_Name01 >> $APP_DIR_PROD/.env &&
+      echo AWS_Bucket_Name02=$AWS_Bucket_Name02 >> $APP_DIR_PROD/.env &&
+      echo publicIP=$publicIP >> $APP_DIR_PROD/.env &&
+      echo elasticIp=$elasticIp >> $APP_DIR_PROD/.env &&
+      echo production_frontend_website=$production_frontend_website >> $APP_DIR_PROD/.env &&
+      echo production_backend=$production_backend >> $APP_DIR_PROD/.env
+      "
+
+    # 🔥 Install dependencies
+    - >
+      ssh $SSH_USER@$SSH_HOST_PROD "
+      cd $APP_DIR_PROD &&
+      npm install --production
+      "
+
+    # Restart PM2 (PROD)
+    - >
+      ssh $SSH_USER@$SSH_HOST_PROD "
+      cd $APP_DIR_PROD &&
+      pm2 delete ggplastic-prod || true &&
+      pm2 start dist/server.js --name ggplastic-prod &&
+      pm2 save
+      "
+
+  only:
+    - main
