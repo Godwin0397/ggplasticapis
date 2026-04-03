@@ -10,11 +10,11 @@ build:
   image: node:18
   script:
     - npm install
-    - npm run build   # this creates dist/
+    - npm run build
   artifacts:
     name: "$CI_COMMIT_REF_NAME-dist"
     paths:
-      - dist/         # <-- use dist instead of build
+      - dist/
     expire_in: 1 hour
 
 deploy:
@@ -22,6 +22,7 @@ deploy:
   image: alpine:latest
   dependencies:
     - build
+
   before_script:
     - apk add --no-cache openssh rsync
     - mkdir -p ~/.ssh
@@ -30,13 +31,44 @@ deploy:
     - ssh-keyscan -H $SSH_HOST_DEV >> ~/.ssh/known_hosts
 
   script:
-    - echo "Deploying to Dev server..."
+    - echo "🚀 Deploying to Dev server..."
 
-    # Copy files
+    # Copy project files
     - rsync -avz --delete ./ $SSH_USER@$SSH_HOST_DEV:$APP_DIR_DEV
 
-    # Restart PM2
-    - ssh $SSH_USER@$SSH_HOST_DEV "cd $APP_DIR_DEV && pm2 restart ggplastic-dev"
+    # Create .env file on server
+    - |
+      ssh $SSH_USER@$SSH_HOST_DEV "cat > $APP_DIR_DEV/.env <<EOF
+mongodb_url=$mongodb_url
+port=$port
+JWT_SECRET=$JWT_SECRET
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+AWS_REGION=$AWS_REGION
+AWS_Bucket_Name01=$AWS_Bucket_Name01
+AWS_Bucket_Name02=$AWS_Bucket_Name02
+localhost_backend_server_3001=$localhost_backend_server_3001
+localhost_frontend_server_5173=$localhost_frontend_server_5173
+localhost_frontend_server_5174=$localhost_frontend_server_5174
+localhost_frontend_server_5175=$localhost_frontend_server_5175
+publicIP=$publicIP
+elasticIp=$elasticIp
+production_frontend_website=$production_frontend_website
+production_backend=$production_backend
+production_port=$production_port
+uat_backend=$uat_backend
+uat_port=$uat_port
+dev_backend=$dev_backend
+EOF"
+
+    # Restart PM2 safely
+    - |
+      ssh $SSH_USER@$SSH_HOST_DEV "
+      cd $APP_DIR_DEV &&
+      pm2 delete ggplastic-dev || true &&
+      pm2 start dist/server.js --name ggplastic-dev &&
+      pm2 save
+      "
 
   only:
     - main
