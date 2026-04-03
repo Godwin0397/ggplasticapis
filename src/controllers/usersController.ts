@@ -41,7 +41,7 @@ const usersController = {
         try {
             // get the user data from the request body
             const { username, password } = req.body;
-
+            console.log("userName", username)
             // check if the user exists
             const user = await Users.findOne<any>({username});
             
