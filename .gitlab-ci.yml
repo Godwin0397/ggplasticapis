@@ -19,6 +19,8 @@ build:
 deploy:
   stage: deploy
   image: alpine:latest
+  dependencies:
+    - build  # <--- add this line to get build artifacts
   before_script:
     - apk add --no-cache openssh rsync
     - mkdir -p ~/.ssh
