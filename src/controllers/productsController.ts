@@ -6,16 +6,6 @@ import getFileDetails from "../utlis/getFileDetails";
 import uploadToS3 from "../utlis/uploadToS3";
 
 
-
-
-const s3 = new S3Client({
-    region: config.AWS_Region,
-    credentials: {
-        accessKeyId: config.AWS_Access_Key,
-        secretAccessKey: config.AWS_Secret_Key,
-    },
-});
-
 const productsController = {
     allProducts: async (req: Request, res: Response) => {
         try {

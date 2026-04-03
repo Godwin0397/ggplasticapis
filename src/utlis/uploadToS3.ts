@@ -3,10 +3,10 @@ import config from "../utlis/config";
 import { v4 as uuidv4 } from "uuid";
 
 const s3 = new S3Client({
-    region: config.AWS_Region,
+    region: config.AWS_REGION,
     credentials: {
-        accessKeyId: config.AWS_Access_Key,
-        secretAccessKey: config.AWS_Secret_Key,
+        accessKeyId: config.AWS_ACCESS_KEY_ID,
+        secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
     },
 });
 
@@ -57,7 +57,7 @@ const uploadToS3 = async ({
             ContentType: contentType
         }));
 
-        return `https://${file ? config.AWS_Bucket_Name01 : config.AWS_Bucket_Name02}.s3.${config.AWS_Region}.amazonaws.com/${key}`;
+        return `https://${file ? config.AWS_Bucket_Name01 : config.AWS_Bucket_Name02}.s3.${config.AWS_REGION}.amazonaws.com/${key}`;
 
     } catch (error) {
         console.error("S3 Upload Error:", error);
