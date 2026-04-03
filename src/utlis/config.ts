@@ -5,9 +5,9 @@ interface Config {
   mongodb_url: string;
   port: number;
   JWT_SECRET: string;
-  AWS_Access_Key: string;
-  AWS_Secret_Key: string;
-  AWS_Region: string;
+  AWS_ACCESS_KEY_ID: string;
+  AWS_SECRET_ACCESS_KEY: string;
+  AWS_REGION: string;
   AWS_Bucket_Name01: string;
   AWS_Bucket_Name02: string;
   localhost_backend_server_3001: string;
@@ -31,9 +31,9 @@ const config: Config = {
   uat_port: process.env.uat_port ? Number(process.env.uat_port) : 3002,
   production_port: process.env.production_port ? Number(process.env.production_port) : 5000,
   JWT_SECRET: process.env.JWT_SECRET || "",
-  AWS_Access_Key: process.env.AWS_Access_Key || "",
-  AWS_Secret_Key: process.env.AWS_Secret_Key || "",
-  AWS_Region: process.env.AWS_Region || "",
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
+  AWS_REGION: process.env.AWS_REGION || "",
   AWS_Bucket_Name01: process.env.AWS_Bucket_Name01 || "",
   AWS_Bucket_Name02: process.env.AWS_Bucket_Name02 || "",
   localhost_backend_server_3001: process.env.localhost_backend_server_3001 || "",
