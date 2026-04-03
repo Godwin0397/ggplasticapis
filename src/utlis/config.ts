@@ -15,8 +15,10 @@ interface Config {
   localhost_frontend_server_5174: string;
   localhost_frontend_server_5175: string;
   publicIP: string;
+  elasticIp: string;
   production_frontend_website: string;
   production_backend: string;
+  dev_backend: string;
   production_port: number;
   uat_backend: string;
   uat_port: number;
@@ -39,9 +41,11 @@ const config: Config = {
   localhost_frontend_server_5174: process.env.localhost_frontend_server_5174 || "",
   localhost_frontend_server_5175: process.env.localhost_frontend_server_5175 || "",
   publicIP: process.env.publicIP || "",
+  elasticIp: process.env.elasticIp || "",
   production_frontend_website: process.env.production_frontend_website || "",
   production_backend: process.env.production_backend || "",
   uat_backend: process.env.uat_backend || "",
+  dev_backend: process.env.dev_backend || ""
 };
 
 export default config;
