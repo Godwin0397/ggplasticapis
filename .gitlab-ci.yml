@@ -17,7 +17,8 @@ build:
       - dist/
     expire_in: 1 hour
 
-deploy:
+# ================= DEV DEPLOY =================
+deploy-dev:
   stage: deploy
   image: alpine:latest
   dependencies:
@@ -33,10 +34,10 @@ deploy:
   script:
     - echo "🚀 Deploying to Dev server..."
 
-    # Copy files to server
+    # Copy files
     - rsync -avz --delete ./ $SSH_USER@$SSH_HOST_DEV:$APP_DIR_DEV
 
-    # Create .env file safely
+    # Create .env
     - >
       ssh $SSH_USER@$SSH_HOST_DEV "
       echo mongodb_url=$mongodb_url > $APP_DIR_DEV/.env &&
@@ -61,14 +62,62 @@ deploy:
       echo dev_backend=$dev_backend >> $APP_DIR_DEV/.env
       "
 
-    # Restart PM2
+    # Restart PM2 (DEV)
     - >
       ssh $SSH_USER@$SSH_HOST_DEV "
       cd $APP_DIR_DEV &&
-      pm2 delete ggplastic-dev || true &&
-      pm2 start dist/server.js --name ggplastic-dev &&
+      pm2 restart ggplastic-dev || pm2 start dist/server.js --name ggplastic-dev &&
       pm2 save
       "
 
   only:
     - main
+
+
+# ================= UAT DEPLOY =================
+deploy-uat:
+  stage: deploy
+  image: alpine:latest
+  dependencies:
+    - build
+
+  before_script:
+    - apk add --no-cache openssh rsync
+    - mkdir -p ~/.ssh
+    - echo "$EC2_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST_DEV >> ~/.ssh/known_hosts
+
+  script:
+    - echo "🚀 Deploying to UAT server..."
+
+    # Copy files to UAT folder
+    - rsync -avz --delete ./ $SSH_USER@$SSH_HOST_DEV:/var/www/ggplastic-uat
+
+    # Create .env for UAT
+    - >
+      ssh $SSH_USER@$SSH_HOST_DEV "
+      echo mongodb_url=$mongodb_url > /var/www/ggplastic-uat/.env &&
+      echo port=$uat_port >> /var/www/ggplastic-uat/.env &&
+      echo JWT_SECRET=$JWT_SECRET >> /var/www/ggplastic-uat/.env &&
+      echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> /var/www/ggplastic-uat/.env &&
+      echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> /var/www/ggplastic-uat/.env &&
+      echo AWS_REGION=$AWS_REGION >> /var/www/ggplastic-uat/.env &&
+      echo AWS_Bucket_Name01=$AWS_Bucket_Name01 >> /var/www/ggplastic-uat/.env &&
+      echo AWS_Bucket_Name02=$AWS_Bucket_Name02 >> /var/www/ggplastic-uat/.env &&
+      echo publicIP=$publicIP >> /var/www/ggplastic-uat/.env &&
+      echo elasticIp=$elasticIp >> /var/www/ggplastic-uat/.env &&
+      echo uat_backend=$uat_backend >> /var/www/ggplastic-uat/.env &&
+      echo uat_port=$uat_port >> /var/www/ggplastic-uat/.env
+      "
+
+    # Restart PM2 (UAT)
+    - >
+      ssh $SSH_USER@$SSH_HOST_DEV "
+      cd /var/www/ggplastic-uat &&
+      pm2 restart ggplastic-uat || pm2 start dist/server.js --name ggplastic-uat &&
+      pm2 save
+      "
+
+  only:
+    - uat
