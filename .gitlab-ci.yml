@@ -32,43 +32,51 @@ deploy-dev:
     - ssh-keyscan -H $SSH_HOST_DEV >> ~/.ssh/known_hosts
 
   script:
-    - echo "🚀 Deploying to Dev server..."
+  - echo "🚀 Deploying to Dev server..."
 
-    # Copy files
-    - rsync -avz --delete ./ $SSH_USER@$SSH_HOST_DEV:$APP_DIR_DEV
+  # Copy files
+  - rsync -avz --delete ./ $SSH_USER@$SSH_HOST_DEV:$APP_DIR_DEV
 
-    # Create .env
-    - >
-      ssh $SSH_USER@$SSH_HOST_DEV "
-      echo mongodb_url=$mongodb_url > $APP_DIR_DEV/.env &&
-      echo port=$port >> $APP_DIR_DEV/.env &&
-      echo JWT_SECRET=$JWT_SECRET >> $APP_DIR_DEV/.env &&
-      echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> $APP_DIR_DEV/.env &&
-      echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> $APP_DIR_DEV/.env &&
-      echo AWS_REGION=$AWS_REGION >> $APP_DIR_DEV/.env &&
-      echo AWS_Bucket_Name01=$AWS_Bucket_Name01 >> $APP_DIR_DEV/.env &&
-      echo AWS_Bucket_Name02=$AWS_Bucket_Name02 >> $APP_DIR_DEV/.env &&
-      echo localhost_backend_server_3001=$localhost_backend_server_3001 >> $APP_DIR_DEV/.env &&
-      echo localhost_frontend_server_5173=$localhost_frontend_server_5173 >> $APP_DIR_DEV/.env &&
-      echo localhost_frontend_server_5174=$localhost_frontend_server_5174 >> $APP_DIR_DEV/.env &&
-      echo localhost_frontend_server_5175=$localhost_frontend_server_5175 >> $APP_DIR_DEV/.env &&
-      echo publicIP=$publicIP >> $APP_DIR_DEV/.env &&
-      echo elasticIp=$elasticIp >> $APP_DIR_DEV/.env &&
-      echo production_frontend_website=$production_frontend_website >> $APP_DIR_DEV/.env &&
-      echo production_backend=$production_backend >> $APP_DIR_DEV/.env &&
-      echo production_port=$production_port >> $APP_DIR_DEV/.env &&
-      echo uat_backend=$uat_backend >> $APP_DIR_DEV/.env &&
-      echo uat_port=$uat_port >> $APP_DIR_DEV/.env &&
-      echo dev_backend=$dev_backend >> $APP_DIR_DEV/.env
-      "
+  # Create .env
+  - >
+    ssh $SSH_USER@$SSH_HOST_DEV "
+    echo mongodb_url=$mongodb_url > $APP_DIR_DEV/.env &&
+    echo port=$port >> $APP_DIR_DEV/.env &&
+    echo JWT_SECRET=$JWT_SECRET >> $APP_DIR_DEV/.env &&
+    echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> $APP_DIR_DEV/.env &&
+    echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> $APP_DIR_DEV/.env &&
+    echo AWS_REGION=$AWS_REGION >> $APP_DIR_DEV/.env &&
+    echo AWS_Bucket_Name01=$AWS_Bucket_Name01 >> $APP_DIR_DEV/.env &&
+    echo AWS_Bucket_Name02=$AWS_Bucket_Name02 >> $APP_DIR_DEV/.env &&
+    echo localhost_backend_server_3001=$localhost_backend_server_3001 >> $APP_DIR_DEV/.env &&
+    echo localhost_frontend_server_5173=$localhost_frontend_server_5173 >> $APP_DIR_DEV/.env &&
+    echo localhost_frontend_server_5174=$localhost_frontend_server_5174 >> $APP_DIR_DEV/.env &&
+    echo localhost_frontend_server_5175=$localhost_frontend_server_5175 >> $APP_DIR_DEV/.env &&
+    echo publicIP=$publicIP >> $APP_DIR_DEV/.env &&
+    echo elasticIp=$elasticIp >> $APP_DIR_DEV/.env &&
+    echo production_frontend_website=$production_frontend_website >> $APP_DIR_DEV/.env &&
+    echo production_backend=$production_backend >> $APP_DIR_DEV/.env &&
+    echo production_port=$production_port >> $APP_DIR_DEV/.env &&
+    echo uat_backend=$uat_backend >> $APP_DIR_DEV/.env &&
+    echo uat_port=$uat_port >> $APP_DIR_DEV/.env &&
+    echo dev_backend=$dev_backend >> $APP_DIR_DEV/.env
+    "
 
-    # Restart PM2 (DEV)
-    - >
-      ssh $SSH_USER@$SSH_HOST_DEV "
-      cd $APP_DIR_DEV &&
-      pm2 restart ggplastic-dev || pm2 start dist/server.js --name ggplastic-dev &&
-      pm2 save
-      "
+  # 🔥 Install dependencies (THIS WAS MISSING)
+  - >
+    ssh $SSH_USER@$SSH_HOST_DEV "
+    cd $APP_DIR_DEV &&
+    npm install --production
+    "
+
+  # Restart PM2
+  - >
+    ssh $SSH_USER@$SSH_HOST_DEV "
+    cd $APP_DIR_DEV &&
+    pm2 delete ggplastic-dev || true &&
+    pm2 start dist/server.js --name ggplastic-dev &&
+    pm2 save
+    "
 
   only:
     - main
