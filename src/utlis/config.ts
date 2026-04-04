@@ -17,6 +17,8 @@ interface Config {
   publicIP: string;
   elasticIp: string;
   production_frontend_website: string;
+  uat_frontend_website: string;
+  dev_frontend_website: string;
   production_backend: string;
   dev_backend: string;
   production_port: number;
@@ -43,6 +45,8 @@ const config: Config = {
   publicIP: process.env.publicIP || "",
   elasticIp: process.env.elasticIp || "",
   production_frontend_website: process.env.production_frontend_website || "",
+  uat_frontend_website: process.env.uat_frontend_website || "",
+  dev_frontend_website: process.env.dev_frontend_website || "",
   production_backend: process.env.production_backend || "",
   uat_backend: process.env.uat_backend || "",
   dev_backend: process.env.dev_backend || ""
