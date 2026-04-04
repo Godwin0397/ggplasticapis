@@ -24,6 +24,10 @@ interface Config {
   production_port: number;
   uat_backend: string;
   uat_port: number;
+  dev_billing_invoice_frontend: string;
+  uat_billing_invoice_frontend: string;
+  prod_billing_invoice_frontend: string;
+
 }
 
 // Parse env variables and provide defaults if needed
@@ -49,7 +53,10 @@ const config: Config = {
   dev_frontend_website: process.env.dev_frontend_website || "",
   production_backend: process.env.production_backend || "",
   uat_backend: process.env.uat_backend || "",
-  dev_backend: process.env.dev_backend || ""
+  dev_backend: process.env.dev_backend || "",
+  dev_billing_invoice_frontend: process.env.dev_billing_invoice_frontend || "",
+  uat_billing_invoice_frontend: process.env.uat_billing_invoice_frontend || "",
+  prod_billing_invoice_frontend: process.env.prod_billing_invoice_frontend || ""
 };
 
 export default config;
