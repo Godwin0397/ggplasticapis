@@ -55,6 +55,7 @@ deploy:
     - ssh $SSH_USER@$SSH_HOST_DEV "echo AWS_Bucket_Name01=$AWS_Bucket_Name01 >> $APP_DIR_DEV/.env"
     - ssh $SSH_USER@$SSH_HOST_DEV "echo AWS_Bucket_Name02=$AWS_Bucket_Name02 >> $APP_DIR_DEV/.env"
     - ssh $SSH_USER@$SSH_HOST_DEV "echo dev_backend=$dev_backend >> $APP_DIR_DEV/.env"
+    - ssh $SSH_USER@$SSH_HOST_DEV "echo dev_frontend_website=$dev_frontend_website >> $APP_DIR_DEV/.env"
 
     # Restart PM2
     - ssh $SSH_USER@$SSH_HOST_DEV "cd $APP_DIR_DEV && pm2 delete ggplastic-dev || true"
