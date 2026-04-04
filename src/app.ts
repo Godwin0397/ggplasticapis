@@ -18,7 +18,7 @@ app.use(express.json())
 //  To parse FORM data
 app.use(express.urlencoded({ extended: true }))
 
-const allowedOrigins = [config.localhost_backend_server_3001, config.localhost_frontend_server_5173, config.localhost_frontend_server_5174, config.localhost_frontend_server_5175, config.publicIP, config.production_frontend_website, config.production_backend, config.uat_backend, config.elasticIp, config.dev_backend];
+const allowedOrigins = [config.localhost_backend_server_3001, config.localhost_frontend_server_5173, config.localhost_frontend_server_5174, config.localhost_frontend_server_5175, config.publicIP, config.production_frontend_website, config.uat_frontend_website, config.dev_frontend_website, config.production_backend, config.uat_backend, config.elasticIp, config.dev_backend];
 
 // use cors middleware
 app.use(cors({
